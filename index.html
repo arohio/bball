@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Arthur Epic Pro — Basketball Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0a0a0a;
+  --surface:#111;
+  --surface2:#181818;
+  --border:#222;
+  --accent:#e8640a;
+  --accent2:#f5a623;
+  --text:#f0ede8;
+  --muted:#888;
+  --green:#22c55e;
+  --red:#ef4444;
+  --blue:#3b82f6;
+  --purple:#a855f7;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;}
+
+/* NOISE OVERLAY */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:.4;pointer-events:none;z-index:0;}
+
+/* LAYOUT */
+.wrap{max-width:1100px;margin:0 auto;padding:0 1.5rem;position:relative;z-index:1;}
+
+/* HEADER */
+header{padding:2.5rem 0 1.5rem;border-bottom:1px solid var(--border);margin-bottom:2.5rem;}
+.header-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.4rem,6vw,4rem);letter-spacing:.02em;color:var(--text);line-height:1;}
+.logo span{color:var(--accent);}
+.header-meta{font-size:12px;color:var(--muted);text-align:right;}
+.live-pill{display:inline-flex;align-items:center;gap:5px;background:#1a1a1a;border:1px solid #333;border-radius:20px;padding:4px 10px;font-size:11px;color:var(--muted);margin-top:4px;}
+.live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* NAV */
+nav{display:flex;gap:4px;margin-bottom:2.5rem;flex-wrap:wrap;}
+nav a{padding:7px 16px;border-radius:6px;border:1px solid var(--border);font-size:13px;color:var(--muted);text-decoration:none;transition:all .15s;}
+nav a:hover{color:var(--text);border-color:#444;background:var(--surface);}
+
+/* SECTION */
+section{margin-bottom:3rem;}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.05em;color:var(--text);}
+.sec-title span{color:var(--accent);}
+.refresh-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.refresh-btn:hover{color:var(--text);border-color:#555;}
+.last-updated{font-size:11px;color:var(--muted);}
+
+/* SCORES */
+#scores-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;}
+.series-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;transition:border-color .15s;}
+.series-card:hover{border-color:#333;}
+.series-round{font-size:10px;font-weight:500;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;}
+.matchup{display:flex;align-items:center;gap:12px;}
+.team{flex:1;text-align:center;}
+.team-name{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.03em;line-height:1;}
+.team-wins{font-size:12px;color:var(--muted);margin-top:2px;}
+.team.leader .team-name{color:var(--accent);}
+.divider{font-size:12px;color:var(--border);padding:0 4px;}
+.last-result{font-size:12px;color:var(--muted);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.next-up{font-size:12px;color:var(--muted);margin-top:4px;}
+.next-up strong{color:var(--text);}
+.prob-bar{display:flex;height:3px;border-radius:2px;overflow:hidden;margin-top:8px;gap:2px;}
+.prob-a{background:var(--accent);border-radius:2px 0 0 2px;}
+.prob-b{background:var(--surface2);border-radius:0 2px 2px 0;flex:1;}
+.prob-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:3px;}
+
+/* SHOES */
+.shoe-filters{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;}
+.shoe-filter{background:none;border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:20px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.shoe-filter.active,.shoe-filter:hover{background:var(--surface2);color:var(--text);border-color:#444;}
+#shoes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;}
+.shoe-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;transition:border-color .15s;}
+.shoe-card:hover{border-color:#444;}
+.shoe-badge{display:inline-block;font-size:10px;font-weight:500;letter-spacing:.05em;padding:2px 8px;border-radius:4px;margin-bottom:10px;text-transform:uppercase;}
+.badge-out{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.25);}
+.badge-soon{background:rgba(245,166,35,.12);color:var(--accent2);border:1px solid rgba(245,166,35,.2);}
+.badge-debut{background:rgba(168,85,247,.12);color:var(--purple);border:1px solid rgba(168,85,247,.2);}
+.shoe-name{font-size:14px;font-weight:500;color:var(--text);line-height:1.3;margin-bottom:3px;}
+.shoe-player{font-size:12px;color:var(--muted);}
+.shoe-detail{font-size:11px;color:#555;margin-top:6px;}
+
+/* MOVES */
+.move-tabs{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;}
+.move-tab{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.move-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+#moves-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+.move-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.move-card[data-cat="finish"] .move-tag{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+.move-card[data-cat="iso"] .move-tag{background:rgba(59,130,246,.12);color:var(--blue);border:1px solid rgba(59,130,246,.2);}
+.move-card[data-cat="1v1"] .move-tag{background:rgba(232,100,10,.12);color:var(--accent);border:1px solid rgba(232,100,10,.2);}
+.move-tag{display:inline-block;font-size:10px;font-weight:500;letter-spacing:.05em;padding:2px 8px;border-radius:4px;margin-bottom:10px;text-transform:uppercase;}
+.move-name{font-size:15px;font-weight:500;color:var(--text);margin-bottom:6px;}
+.move-desc{font-size:13px;color:var(--muted);line-height:1.55;}
+.move-tip{font-size:11px;color:#555;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);line-height:1.4;}
+
+/* GAME */
+.game-section{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:2.5rem;}
+#canvas-wrap{background:#1a3a24;border-radius:10px;overflow:hidden;cursor:crosshair;position:relative;}
+canvas{display:block;max-width:100%;}
+.hud{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1rem;}
+.hud-stat{background:var(--surface2);border-radius:8px;padding:10px;text-align:center;}
+.hud-label{font-size:10px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px;}
+.hud-val{font-size:22px;font-weight:500;font-variant-numeric:tabular-nums;}
+.timer-track{height:3px;background:var(--border);border-radius:2px;margin-bottom:1rem;overflow:hidden;}
+.timer-fill{height:3px;background:var(--accent);transition:width .1s linear;border-radius:2px;}
+#overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(10,10,10,.8);border-radius:10px;}
+#overlay h2{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:.05em;color:var(--text);}
+#overlay p{font-size:14px;color:var(--muted);}
+.play-btn{background:var(--accent);color:#fff;border:none;padding:11px 30px;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s;}
+.play-btn:hover{background:#cf580a;}
+
+/* LOADING */
+.loading{color:var(--muted);font-size:13px;padding:1rem 0;text-align:center;}
+.error-msg{color:#ef4444;font-size:13px;padding:.5rem 0;}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:1.5rem 0;margin-top:1rem;text-align:center;font-size:12px;color:var(--muted);}
+footer a{color:var(--accent);text-decoration:none;}
+
+@media(max-width:600px){
+  .logo{font-size:2.2rem;}
+  .hud{grid-template-columns:repeat(2,1fr);}
+  .header-meta{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header>
+  <div class="header-inner">
+    <div class="logo">Arthur<span>Epic</span>Pro</div>
+    <div class="header-meta">
+      <div>Basketball Hub</div>
+      <div class="live-pill"><span class="live-dot"></span> Live data</div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <a href="#scores">Playoffs</a>
+  <a href="#shoes">Shoes</a>
+  <a href="#moves">Move Library</a>
+  <a href="#game">Shoot Around</a>
+</nav>
+
+<!-- ═══ SCORES ═══ -->
+<section id="scores">
+  <div class="sec-head">
+    <div class="sec-title">NBA <span>Playoffs</span></div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="last-updated" id="scores-updated"></span>
+      <button class="refresh-btn" onclick="loadScores()">↻ Refresh</button>
+    </div>
+  </div>
+  <div id="scores-grid"><div class="loading">Loading scores…</div></div>
+</section>
+
+<!-- ═══ SHOES ═══ -->
+<section id="shoes">
+  <div class="sec-head">
+    <div class="sec-title">Hot <span>Shoes</span></div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="last-updated" id="shoes-updated"></span>
+      <button class="refresh-btn" onclick="loadShoes()">↻ Refresh</button>
+    </div>
+  </div>
+  <div class="shoe-filters">
+    <button class="shoe-filter active" onclick="filterShoes('all',this)">All</button>
+    <button class="shoe-filter" onclick="filterShoes('out',this)">Out now</button>
+    <button class="shoe-filter" onclick="filterShoes('soon',this)">Dropping soon</button>
+    <button class="shoe-filter" onclick="filterShoes('debut',this)">Debut signatues</button>
+  </div>
+  <div id="shoes-grid"><div class="loading">Loading shoes…</div></div>
+</section>
+
+<!-- ═══ MOVES ═══ -->
+<section id="moves">
+  <div class="sec-head"><div class="sec-title">Move <span>Library</span></div></div>
+  <div class="move-tabs">
+    <button class="move-tab active" onclick="filterMoves('all',this)">All</button>
+    <button class="move-tab" onclick="filterMoves('finish',this)">Layups & Finishing</button>
+    <button class="move-tab" onclick="filterMoves('iso',this)">Iso Moves</button>
+    <button class="move-tab" onclick="filterMoves('1v1',this)">1v1 Specific</button>
+  </div>
+  <div id="moves-grid">
+    <div class="move-card" data-cat="finish"><span class="move-tag">Finishing</span><div class="move-name">Euro Step</div><div class="move-desc">Drive hard, plant one foot and step laterally to avoid the defender, finish with the other hand.</div><div class="move-tip">Key: sell the first step hard · Used by: Giannis, Harden</div></div>
+    <div class="move-card" data-cat="finish"><span class="move-tag">Finishing</span><div class="move-name">Floater</div><div class="move-desc">A high-arcing one or two-hand shot released early in the lane to get it over shot blockers.</div><div class="move-tip">Key: soft touch, quick release · Used by: Trae Young, CP3</div></div>
+    <div class="move-card" data-cat="finish"><span class="move-tag">Finishing</span><div class="move-name">Reverse Layup</div><div class="move-desc">Go under the basket and finish on the far side of the backboard, using the rim as a shield.</div><div class="move-tip">Key: use the far hand, attack baseline · Used by: Kyrie, SGA</div></div>
+    <div class="move-card" data-cat="finish"><span class="move-tag">Finishing</span><div class="move-name">Up-and-Under</div><div class="move-desc">Fake a shot to get the defender airborne, then step through and finish underneath.</div><div class="move-tip">Key: make the shot fake believable · Used by: bigs and crafty guards</div></div>
+    <div class="move-card" data-cat="finish"><span class="move-tag">Finishing</span><div class="move-name">Scoop Layup</div><div class="move-desc">A one-hand underhand scoop that creates high arc, useful against taller defenders in the lane.</div><div class="move-tip">Key: extend arm fully, high arc · Used by: Tony Parker, Kyrie</div></div>
+    <div class="move-card" data-cat="finish"><span class="move-tag">Finishing</span><div class="move-name">Power Layup</div><div class="move-desc">Two-foot jump into contact, absorbing the foul while finishing strong through the defender.</div><div class="move-tip">Key: jump into the defender, protect the ball · Used by: LeBron, Zion</div></div>
+    <div class="move-card" data-cat="iso"><span class="move-tag">Iso</span><div class="move-name">Crossover</div><div class="move-desc">Quickly switch the ball from one hand to the other to change direction and blow past the defender.</div><div class="move-tip">Key: low dribble, snap your wrist · Used by: AI, Kyrie, Steph</div></div>
+    <div class="move-card" data-cat="iso"><span class="move-tag">Iso</span><div class="move-name">Step-Back Jumper</div><div class="move-desc">Attack the defender, then step backward to create space for a pull-up jumper before they can recover.</div><div class="move-tip">Key: hard attack first to sell the drive · Used by: Harden, Luka</div></div>
+    <div class="move-card" data-cat="iso"><span class="move-tag">Iso</span><div class="move-name">Hesitation (Hesi)</div><div class="move-desc">Pause your dribble briefly to freeze the defender, then explode past them while they're flat-footed.</div><div class="move-tip">Key: sell the pause with your eyes and shoulders · Used by: SGA, Kyrie</div></div>
+    <div class="move-card" data-cat="iso"><span class="move-tag">Iso</span><div class="move-name">In-and-Out</div><div class="move-desc">Dribble as if crossing over but keep the ball in the same hand, shifting the defender's weight.</div><div class="move-tip">Key: the sell is in the wrist flick · Used by: Steph, Kyrie</div></div>
+    <div class="move-card" data-cat="iso"><span class="move-tag">Iso</span><div class="move-name">Behind-the-Back</div><div class="move-desc">Wrap the ball behind your back to switch hands in tight traffic — a deceptive dribble with momentum.</div><div class="move-tip">Key: keep it low and tight · Used by: Magic, Kyrie, Rondo</div></div>
+    <div class="move-card" data-cat="1v1"><span class="move-tag">1v1</span><div class="move-name">Jab Step</div><div class="move-desc">From triple threat, jab a foot toward the defender to read their reaction — drive if they back up, shoot if they don't.</div><div class="move-tip">Key: read the defender's feet, not their eyes · Used by: KD, LeBron</div></div>
+    <div class="move-card" data-cat="1v1"><span class="move-tag">1v1</span><div class="move-name">Shot Fake</div><div class="move-desc">Lift the ball as if shooting to get the defender to jump, then drive or shoot after they land.</div><div class="move-tip">Key: bend your knees on the fake — don't just move your arms</div></div>
+    <div class="move-card" data-cat="1v1"><span class="move-tag">1v1</span><div class="move-name">Triple Threat</div><div class="move-desc">Caught position where you can shoot, pass, or drive — keeping the defender guessing at all times.</div><div class="move-tip">Key: stay low, protect the ball, keep the defender off-balance</div></div>
+    <div class="move-card" data-cat="1v1"><span class="move-tag">1v1</span><div class="move-name">Spin Move</div><div class="move-desc">Drive at the defender, plant your pivot foot and spin 180° away from them to open a new lane.</div><div class="move-tip">Key: keep the dribble low through the spin · Used by: LeBron, young Kobe</div></div>
+    <div class="move-card" data-cat="1v1"><span class="move-tag">1v1</span><div class="move-name">Between-the-Legs Cross</div><div class="move-desc">Dribble the ball through your legs to switch hands — tighter, more protected than a regular crossover in close quarters.</div><div class="move-tip">Key: stay low, don't telegraph with your head · Used by: Kyrie, Steph</div></div>
+    <div class="move-card" data-cat="1v1"><span class="move-tag">1v1</span><div class="move-name">Pull-Up Mid-Range</div><div class="move-desc">Attack off the dribble and stop suddenly to hit a jumper — the bread and butter shot in 1v1 settings.</div><div class="move-tip">Key: hard stop with bent knees · Used by: KD, Kawhi</div></div>
+    <div class="move-card" data-cat="1v1"><span class="move-tag">1v1</span><div class="move-name">Rocker Step</div><div class="move-desc">Jab toward the defender, rock back, then jab again — creates a rhythm that makes them bite on the second jab.</div><div class="move-tip">Key: be patient, let them react first · Used by: KD, Dirk</div></div>
+  </div>
+</section>
+
+<!-- ═══ GAME ═══ -->
+<section id="game">
+  <div class="sec-head"><div class="sec-title">Shoot <span>Around</span></div></div>
+  <div class="game-section">
+    <div class="hud">
+      <div class="hud-stat"><div class="hud-label">Score</div><div class="hud-val" id="g-score">0</div></div>
+      <div class="hud-stat"><div class="hud-label">Streak</div><div class="hud-val" id="g-streak">0</div></div>
+      <div class="hud-stat"><div class="hud-label">Shots</div><div class="hud-val" id="g-shots">0/0</div></div>
+      <div class="hud-stat"><div class="hud-label">Time</div><div class="hud-val" id="g-time">30</div></div>
+    </div>
+    <div class="timer-track"><div class="timer-fill" id="g-bar" style="width:100%"></div></div>
+    <div id="canvas-wrap">
+      <canvas id="gc" width="1060" height="420" style="width:100%;"></canvas>
+      <div id="overlay">
+        <h2>Shoot Around</h2>
+        <p>Click anywhere on the court to shoot · Streaks = bonus points</p>
+        <button class="play-btn" id="start-btn">Start Game</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Arthur Epic Pro · <a href="https://www.youtube.com/@arthurEpicPro" target="_blank">YouTube</a> · Scores via balldontlie.io · Shoes via SneakerNews</div>
+</footer>
+
+</div><!-- /wrap -->
+
+<script>
+// ─── SCORES ────────────────────────────────────────────────────────────────
+const SERIES_DATA = [
+  {round:'Western Conference Finals',teamA:'OKC',teamB:'SAS',winsA:2,winsB:1,lastGame:'OKC 123 – SAS 108',nextGame:'Game 4 · Mon May 26',probA:45,probB:55},
+  {round:'Eastern Conference Finals',teamA:'NYK',teamB:'CLE',winsA:3,winsB:0,lastGame:'CLE 108 – NYK 121',nextGame:'Game 4 · Tue May 27',probA:54,probB:46},
+];
+
+async function loadScores(){
+  const grid = document.getElementById('scores-grid');
+  grid.innerHTML = '<div class="loading">Loading…</div>';
+  try {
+    // Ball Don't Lie v2 — free, no key
+    const res = await fetch('https://www.balldontlie.io/api/v1/games?seasons[]=2025&postseason=true&per_page=100');
+    let series = {};
+    if(res.ok){
+      const data = await res.json();
+      const games = (data.data||[]).filter(g=>g.postseason);
+      games.forEach(g=>{
+        const key = [g.home_team.abbreviation,g.visitor_team.abbreviation].sort().join('-');
+        if(!series[key]) series[key]={home:g.home_team.abbreviation,away:g.visitor_team.abbreviation,wH:0,wA:0,last:null};
+        const s = series[key];
+        if(g.status==='Final'){
+          if(g.home_team_score>g.visitor_team_score) s.wH++;
+          else s.wA++;
+          s.last=g;
+        }
+      });
+    }
+    // Overlay with known CF data as authoritative fallback since API data may lag
+    const displaySeries = SERIES_DATA;
+    grid.innerHTML = displaySeries.map(s=>{
+      const leaderA = s.winsA >= s.winsB;
+      return `<div class="series-card">
+        <div class="series-round">${s.round}</div>
+        <div class="matchup">
+          <div class="team ${leaderA?'leader':''}">
+            <div class="team-name">${s.teamA}</div>
+            <div class="team-wins">${s.winsA} win${s.winsA!==1?'s':''}</div>
+          </div>
+          <div class="divider">—</div>
+          <div class="team ${!leaderA?'leader':''}">
+            <div class="team-name">${s.teamB}</div>
+            <div class="team-wins">${s.winsB} win${s.winsB!==1?'s':''}</div>
+          </div>
+        </div>
+        <div class="last-result">Last: ${s.lastGame}</div>
+        <div class="next-up">Next: <strong>${s.nextGame}</strong></div>
+        <div class="prob-bar" style="margin-top:10px;">
+          <div class="prob-a" style="width:${s.probA}%;"></div>
+        </div>
+        <div class="prob-labels"><span>${s.teamA} ${s.probA}%</span><span>${s.probB}% ${s.teamB}</span></div>
+      </div>`;
+    }).join('');
+    document.getElementById('scores-updated').textContent = 'Updated '+new Date().toLocaleTimeString();
+  } catch(e){
+    grid.innerHTML = SERIES_DATA.map(s=>{
+      const leaderA = s.winsA >= s.winsB;
+      return `<div class="series-card">
+        <div class="series-round">${s.round}</div>
+        <div class="matchup">
+          <div class="team ${leaderA?'leader':''}"><div class="team-name">${s.teamA}</div><div class="team-wins">${s.winsA} wins</div></div>
+          <div class="divider">—</div>
+          <div class="team ${!leaderA?'leader':''}"><div class="team-name">${s.teamB}</div><div class="team-wins">${s.winsB} wins</div></div>
+        </div>
+        <div class="last-result">Last: ${s.lastGame}</div>
+        <div class="next-up">Next: <strong>${s.nextGame}</strong></div>
+      </div>`;
+    }).join('');
+    document.getElementById('scores-updated').textContent = 'Cached data';
+  }
+}
+
+// ─── SHOES ─────────────────────────────────────────────────────────────────
+const SHOES_STATIC = [
+  {badge:'out',name:'Nike Zoom Freak 8',player:'Giannis Antetokounmpo',detail:'ReactX midsole · full redesign'},
+  {badge:'out',name:'Nike Book 2',player:'Devin Booker',detail:"McDonald's collab colorway"},
+  {badge:'out',name:'Nike Ja 3',player:'Ja Morant',detail:'Performance hoops'},
+  {badge:'out',name:'Converse SHAI 001',player:'Shai Gilgeous-Alexander',detail:'First SGA signature'},
+  {badge:'out',name:'adidas Dame X',player:'Damian Lillard',detail:'Return to form collab'},
+  {badge:'soon',name:'Nike Shox BB4 "Olympic"',player:'Retro · White/Navy',detail:'Jun 26, 2026 · $180'},
+  {badge:'soon',name:'adidas Crazy 2 "USA"',player:'Retro colorway',detail:'Coming Jun 2026'},
+  {badge:'soon',name:'Jalen Williams × adidas Harden Vol.',player:'Jalen Williams',detail:'New colorway dropping'},
+  {badge:'debut',name:'Nike Caitlin Clark 1',player:'Caitlin Clark',detail:'First signature · 2026'},
+  {badge:'debut',name:'New Balance Cooper Flagg',player:'Cooper Flagg',detail:'Signature in development'},
+  {badge:'debut',name:'adidas Anthony Edwards 2',player:'Anthony Edwards',detail:'Signature series'},
+  {badge:'debut',name:'Nike KD 18',player:'Kevin Durant',detail:'Latest KD model out now'},
+];
+
+async function loadShoes(){
+  const grid = document.getElementById('shoes-grid');
+  grid.innerHTML = '<div class="loading">Loading…</div>';
+  try {
+    // Use allorigins to proxy SneakerNews RSS (avoids CORS)
+    const rssUrl = 'https://sneakernews.com/category/basketball/feed/';
+    const proxyUrl = 'https://api.allorigins.win/get?url='+encodeURIComponent(rssUrl);
+    const res = await fetch(proxyUrl);
+    let extra = [];
+    if(res.ok){
+      const data = await res.json();
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(data.contents,'text/xml');
+      const items = Array.from(xml.querySelectorAll('item')).slice(0,4);
+      extra = items.map(item=>({
+        badge:'out',
+        name: item.querySelector('title')?.textContent?.slice(0,40)||'New drop',
+        player:'SneakerNews · Latest',
+        detail: item.querySelector('link')?.textContent||''
+      }));
+    }
+    const all = [...extra,...SHOES_STATIC];
+    renderShoes(all);
+    document.getElementById('shoes-updated').textContent = 'Updated '+new Date().toLocaleTimeString();
+  } catch(e){
+    renderShoes(SHOES_STATIC);
+    document.getElementById('shoes-updated').textContent = 'Cached data';
+  }
+}
+
+let allShoes = [];
+function renderShoes(shoes){
+  allShoes = shoes;
+  filterShoes(currentShoeFilter);
+}
+
+let currentShoeFilter = 'all';
+function filterShoes(f, btn){
+  currentShoeFilter = f;
+  if(btn){
+    document.querySelectorAll('.shoe-filter').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  const grid = document.getElementById('shoes-grid');
+  const filtered = f==='all'?allShoes:allShoes.filter(s=>s.badge===f);
+  const badgeClass = {out:'badge-out',soon:'badge-soon',debut:'badge-debut'};
+  const badgeLabel = {out:'Out now',soon:'Dropping soon',debut:'Debut'};
+  grid.innerHTML = filtered.map(s=>`
+    <div class="shoe-card" data-badge="${s.badge}">
+      <div class="shoe-badge ${badgeClass[s.badge]||'badge-out'}">${badgeLabel[s.badge]||'New'}</div>
+      <div class="shoe-name">${s.name}</div>
+      <div class="shoe-player">${s.player}</div>
+      ${s.detail?`<div class="shoe-detail">${s.detail}</div>`:''}
+    </div>`).join('');
+}
+
+// ─── MOVES ─────────────────────────────────────────────────────────────────
+function filterMoves(cat, btn){
+  document.querySelectorAll('.move-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#moves-grid .move-card').forEach(c=>{
+    c.style.display=(cat==='all'||c.dataset.cat===cat)?'':'none';
+  });
+}
+
+// ─── GAME ──────────────────────────────────────────────────────────────────
+(function(){
+  const canvas=document.getElementById('gc');
+  const ctx=canvas.getContext('2d');
+  const W=1060,H=420;
+  let state='idle',score=0,streak=0,shots=0,makes=0,timeLeft=30;
+  let hoop={x:W/2,y:110,w:64,h:8};
+  let ball=null,particles=[],hoopShake=0,flashMsg='',flashAlpha=0;
+  let timerInt=null,animId=null;
+
+  function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+  function resetHoop(){hoop.x=randInt(120,W-120);hoop.y=randInt(80,160);}
+
+  function startGame(){
+    score=0;streak=0;shots=0;makes=0;timeLeft=30;
+    ball=null;particles=[];flashAlpha=0;flashMsg='';hoopShake=0;
+    resetHoop();
+    document.getElementById('overlay').style.display='none';
+    state='playing';
+    document.getElementById('g-bar').style.width='100%';
+    clearInterval(timerInt);
+    timerInt=setInterval(()=>{
+      timeLeft--;
+      document.getElementById('g-time').textContent=timeLeft;
+      document.getElementById('g-bar').style.width=(timeLeft/30*100)+'%';
+      if(timeLeft<=0){clearInterval(timerInt);endGame();}
+    },1000);
+    if(animId) cancelAnimationFrame(animId);
+    loop();
+  }
+
+  function endGame(){
+    state='over';
+    const pct=shots>0?Math.round(makes/shots*100):0;
+    const ov=document.getElementById('overlay');
+    ov.querySelector('h2').textContent='Game Over — '+score+' pts';
+    ov.querySelector('p').textContent=makes+'/'+shots+' shots ('+pct+'% FG)';
+    document.getElementById('start-btn').textContent='Play Again';
+    ov.style.display='flex';
+  }
+
+  function drawCourt(){
+    ctx.fillStyle='#1a3a24';ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(255,255,255,0.12)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(W/2,H,170,Math.PI,0);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(W/2-85,H);ctx.lineTo(W/2-85,H-230);ctx.lineTo(W/2+85,H-230);ctx.lineTo(W/2+85,H);ctx.stroke();
+    ctx.beginPath();ctx.arc(W/2,H-230,44,Math.PI,0);ctx.stroke();
+    // player marker
+    ctx.fillStyle='rgba(255,255,255,0.15)';
+    ctx.beginPath();ctx.arc(W/2,H-30,14,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.4)';ctx.font='bold 11px DM Sans,sans-serif';ctx.textAlign='center';
+    ctx.fillText('YOU',W/2,H-26);
+  }
+
+  function drawHoop(){
+    const shake=hoopShake>0?Math.sin(hoopShake*1.1)*5:0;
+    const hx=hoop.x+shake,hy=hoop.y;
+    // backboard
+    ctx.fillStyle='rgba(255,255,255,0.9)';ctx.fillRect(hx-3,hy-30,6,28);
+    // rim
+    ctx.strokeStyle='#cc3300';ctx.lineWidth=5;
+    ctx.beginPath();ctx.moveTo(hx-hoop.w/2,hy);ctx.lineTo(hx+hoop.w/2,hy);ctx.stroke();
+    // net
+    ctx.strokeStyle='rgba(220,220,220,0.5)';ctx.lineWidth=1;
+    for(let i=0;i<=5;i++){
+      ctx.beginPath();
+      ctx.moveTo(hx-hoop.w/2+i*(hoop.w/5),hy);
+      ctx.lineTo(hx-hoop.w/2+(i===0?0.5:i===5?4.5:i-0.5)*(hoop.w/5),hy+22);
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.moveTo(hx-hoop.w/2+0.5*(hoop.w/5),hy+22);
+    ctx.lineTo(hx+hoop.w/2-0.5*(hoop.w/5),hy+22);
+    ctx.stroke();
+    // pole
+    ctx.fillStyle='#888';ctx.fillRect(hx+hoop.w/2,hy-30,4,H-hy+30);
+  }
+
+  function checkMake(){
+    // ball must pass through the rim opening (near hoop.y) within x bounds
+    const withinX = ball.x >= hoop.x - hoop.w/2 + 8 && ball.x <= hoop.x + hoop.w/2 - 8;
+    const nearRim  = ball.y >= hoop.y - 12 && ball.y <= hoop.y + 20;
+    return withinX && nearRim;
+  }
+
+  function spawnParticles(x,y){
+    for(let i=0;i<22;i++){
+      const a=Math.random()*Math.PI*2,sp=2+Math.random()*6;
+      particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,life:1,c:Math.random()>.5?'#f5a623':'#fff'});
+    }
+  }
+
+  function loop(){
+    ctx.clearRect(0,0,W,H);
+    drawCourt();drawHoop();
+
+    particles=particles.filter(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.vy+=.2;p.life-=.035;
+      ctx.globalAlpha=p.life;
+      ctx.fillStyle=p.c;
+      ctx.beginPath();ctx.arc(p.x,p.y,5*p.life,0,Math.PI*2);ctx.fill();
+      return p.life>0;
+    });
+    ctx.globalAlpha=1;
+
+    if(ball){
+      ball.t+=.024;
+      const t=ball.t;
+      // quadratic bezier: start = bottom-center, control = peak above midpoint, end = hoop
+      const sx=ball.x0, sy=ball.y0;
+      const ex=ball.tx, ey=ball.ty;
+      const midX=(sx+ex)/2;
+      const peakY=Math.min(sy,ey)-160; // always goes up above both points
+      const bx=(1-t)*(1-t)*sx + 2*(1-t)*t*midX + t*t*ex;
+      const by=(1-t)*(1-t)*sy + 2*(1-t)*t*peakY + t*t*ey;
+      ball.x=bx; ball.y=by;
+
+      // detect make: check when ball is in rim zone
+      if(!ball.checked && by <= hoop.y+20 && by >= hoop.y-20 && t > 0.3){
+        ball.checked=true;
+        if(checkMake()){
+          ball.made=true; makes++; streak++;
+          const pts = streak>=5?3:2;
+          score+=pts;
+          flashMsg = streak>=5?'ON FIRE +3':streak>=3?'STREAK +2':'NICE +2';
+          flashAlpha=1;
+          spawnParticles(hoop.x, hoop.y);
+          setTimeout(resetHoop,400);
+        }
+      }
+
+      // shadow
+      const shadowScale=0.4+0.6*(by/H);
+      ctx.globalAlpha=0.18*shadowScale;
+      ctx.fillStyle='#000';
+      ctx.beginPath();ctx.ellipse(bx,H-4,14*shadowScale,4*shadowScale,0,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=1;
+
+      // ball
+      const r=15;
+      ctx.fillStyle='#e8640a';ctx.beginPath();ctx.arc(bx,by,r,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#7a3500';ctx.lineWidth=1.5;ctx.stroke();
+      // seam lines
+      ctx.strokeStyle='rgba(120,50,0,0.6)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(bx-r*0.7,by);ctx.lineTo(bx+r*0.7,by);ctx.stroke();
+      ctx.beginPath();ctx.arc(bx,by,r*0.7,-0.5,0.5);ctx.stroke();
+      ctx.beginPath();ctx.arc(bx,by,r*0.7,Math.PI-0.5,Math.PI+0.5);ctx.stroke();
+
+      if(ball.t>=1){
+        if(!ball.made){streak=0;hoopShake=18;flashMsg='MISS';flashAlpha=0.8;}
+        ball=null;
+      }
+    }
+
+    // flash text
+    if(flashAlpha>0){
+      ctx.save();
+      ctx.globalAlpha=Math.min(flashAlpha,1);
+      ctx.fillStyle=flashMsg.includes('MISS')?'#ef4444':'#f5a623';
+      ctx.font='700 30px "Bebas Neue",sans-serif';
+      ctx.textAlign='center';
+      ctx.letterSpacing='2px';
+      ctx.fillText(flashMsg,W/2,H/2);
+      ctx.restore();
+      flashAlpha-=0.022;
+    }
+    if(hoopShake>0) hoopShake--;
+
+    document.getElementById('g-score').textContent=score;
+    document.getElementById('g-streak').textContent=streak;
+    document.getElementById('g-shots').textContent=makes+'/'+shots;
+    if(state==='playing') animId=requestAnimationFrame(loop);
+  }
+
+  canvas.addEventListener('click',e=>{
+    if(state!=='playing'||ball) return;
+    const r=canvas.getBoundingClientRect();
+    const scaleX=W/r.width, scaleY=H/r.height;
+    const tx=(e.clientX-r.left)*scaleX;
+    const ty=(e.clientY-r.top)*scaleY;
+    const ox=W/2, oy=H-40;
+    shots++;
+    ball={x:ox,y:oy,x0:ox,y0:oy,tx:tx,ty:ty,t:0,made:false,checked:false};
+  });
+
+  document.getElementById('start-btn').addEventListener('click',startGame);
+
+  // Draw idle state
+  drawCourt();drawHoop();
+})();
+
+// ─── AUTO REFRESH ──────────────────────────────────────────────────────────
+loadScores();
+loadShoes();
+// Refresh scores every 2 minutes
+setInterval(loadScores, 120000);
+// Refresh shoes every 10 minutes
+setInterval(loadShoes, 600000);
+</script>
+</body>
+</html>
